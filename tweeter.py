@@ -2,7 +2,6 @@
 import discord
 import requests
 import asyncio
-import requests
 import bs4
 from bs4 import BeautifulSoup
 from my_constants import TOKEN, channel_rer
