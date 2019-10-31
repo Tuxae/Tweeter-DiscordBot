@@ -20,7 +20,8 @@ def emoji_converter(emoji):
         "Emoji: Coche blanche en gras" : lambda : ":white_check_mark:",
         "Emoji: Triangle pointant vers la droite" : lambda : ":arrow_right:",
         "Emoji: Panneau chantier " : lambda : ":construction:",
-        "Emoji: Index pointant vers la droite" : lambda : ":point_right:"
+        "Emoji: Index pointant vers la droite" : lambda : ":point_right:",
+        "Emoji: Clé" : lambda : ":wrench:"
     }.get(emoji,lambda: None)()
 
 def tweet_converter(tweet):
