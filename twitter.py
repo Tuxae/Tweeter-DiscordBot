@@ -2,6 +2,7 @@
 import discord
 import requests
 import asyncio
+import aiohttp
 import bs4
 from bs4 import BeautifulSoup
 from my_constants import TOKEN, channel_rer
@@ -49,23 +50,25 @@ client = discord.Client()
 async def on_ready():  
     old_tweets_url = []
     print('Bot ready :-)') 
-    await client.get_channel(channel_rer).send("Bot démarré et prêt!")
     while True:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
                 if r.status == 200:
-                    html = await r.text
+                    html = await r.text()
                     soup = BeautifulSoup(html, 'html.parser')
                     tweets_p = soup.findAll("p", class_="tweet-text")
                     tweets_div = soup.findAll("div", class_="tweet")
-                    tweets_url = [div.attrs.get("data-permalink-path") for div in tweets_div]
+                    tweets_url = [div.attrs.get("data-permalink-path") 
+                            for div in tweets_div]
                     tweets_text = list(map(tweet_converter,tweets_p))
-                    tweets = [Tweet(permalink, text) for permalink, text in zip(tweets_url,tweets_text)]
+                    tweets = [Tweet(permalink, text) 
+                            for permalink, text in zip(tweets_url,tweets_text)]
                     # Reverse the list to send tweets in the chronological order
                     tweets.reverse()
                     # When launched, old_tweets_url is empty
                     # Add the tweets in memory first, no need to send them
                     # in Discord
+                    print(old_tweets_url)
                     if old_tweets_url:
                         for tweet in tweets:
                             if not tweet.permalink in old_tweets_url:
