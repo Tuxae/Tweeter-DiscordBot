@@ -17,7 +17,7 @@ RUN apk add --update python3 git && \
 RUN git clone https://github.com/Tuxae/Twitter-DiscordBot && \
     mv Twitter-DiscordBot/* . && \
     rm -r Twitter-DiscordBot && \
-    pip3 install discord requests asyncio beautifulsoup4 aiohttp
+    pip3 install discord requests asyncio beautifulsoup4
 
 COPY my_constants.py .
 
