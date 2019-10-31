@@ -48,19 +48,26 @@ async def on_ready():
     old_tweets_url = []
     print('Bot ready :-)') 
     while True:
-        r = requests.get(url)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        tweets_p = soup.findAll("p", class_="tweet-text")
-        tweets_div = soup.findAll("div", class_="tweet")
-        tweets_url = [div.attrs.get("data-permalink-path") for div in tweets_div]
-        tweets_text = list(map(tweet_converter,tweets_p))
-        tweets = [Tweet(permalink, text) for permalink, text in zip(tweets_url,tweets_text)]
-        # Reverse the list to send tweets in the chronological order
-        tweets.reverse()
-        for tweet in tweets:
-            if not tweet.permalink in old_tweets_url:
-                await client.get_channel(channel_rer).send(tweet.text)
-        old_tweets_url = tweets_url.copy()
-        await asyncio.sleep(20)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as r:
+                if r.status == 200:
+                    html = await r.text
+                    soup = BeautifulSoup(html, 'html.parser')
+                    tweets_p = soup.findAll("p", class_="tweet-text")
+                    tweets_div = soup.findAll("div", class_="tweet")
+                    tweets_url = [div.attrs.get("data-permalink-path") for div in tweets_div]
+                    tweets_text = list(map(tweet_converter,tweets_p))
+                    tweets = [Tweet(permalink, text) for permalink, text in zip(tweets_url,tweets_text)]
+                    # Reverse the list to send tweets in the chronological order
+                    tweets.reverse()
+                    # When launched, old_tweets_url is empty
+                    # Add the tweets in memory first, no need to send them
+                    # in Discord
+                    if old_tweets_url:
+                        for tweet in tweets:
+                            if not tweet.permalink in old_tweets_url:
+                                await client.get_channel(channel_rer).send(tweet.text)
+                    old_tweets_url = tweets_url.copy()
+                await asyncio.sleep(20)
 
 client.run(TOKEN)
