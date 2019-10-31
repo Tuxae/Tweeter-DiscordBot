@@ -15,11 +15,11 @@ RUN apk add --update python3 git && \
     if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi
 
 RUN git clone https://github.com/Tuxae/Twitter-DiscordBot && \
-    mv Tweeter-DiscordBot/* . && \
-    rm -r Tweeter-DiscordBot && \
+    mv Twitter-DiscordBot/* . && \
+    rm -r Twitter-DiscordBot && \
     pip3 install discord requests asyncio beautifulsoup4
 
 COPY my_constants.py .
 
-CMD ["python3", "tweeter.py"]
+CMD ["python3", "twitter.py"]
 
