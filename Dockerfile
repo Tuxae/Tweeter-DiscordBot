@@ -14,7 +14,7 @@ RUN apk add --update python3 git && \
     pip3 install --no-cache --upgrade pip setuptools wheel && \
     if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi
 
-RUN git clone https://github.com/Tuxae/Tweeter-DiscordBot && \
+RUN git clone https://github.com/Tuxae/Twitter-DiscordBot && \
     mv Tweeter-DiscordBot/* . && \
     rm -r Tweeter-DiscordBot && \
     pip3 install discord requests asyncio beautifulsoup4
