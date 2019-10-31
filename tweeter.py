@@ -47,6 +47,7 @@ client = discord.Client()
 async def on_ready():  
     old_tweets_url = []
     print('Bot ready :-)') 
+    await client.get_channel(channel_rer).send("Bot démarré et prêt!")
     while True:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
