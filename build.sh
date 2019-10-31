@@ -1,6 +1,6 @@
 #!/bin/bash
 
-name=tweeter-discordbot
+name=twitter-discordbot
 
 docker rm -f $name
 docker image rm $name
