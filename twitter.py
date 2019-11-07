@@ -28,16 +28,21 @@ def emoji_converter(emoji):
 def tweet_converter(tweet):
     s = ""
     for e in tweet.contents:
+        # Image
         if e.name == "img" and "Emoji" in e.attrs.get("class"):
             emoji = emoji_converter(e.attrs.get("aria-label"))
             if emoji:
                 s += emoji
+        # Add text
         if type(e) is bs4.element.NavigableString:
             s += e
+        # Transform @mention as text
         if e.name == "a" and "twitter-atreply" in e.attrs.get("class"):
             s += e.text
+        # Add #hashtag as text
         if e.name == "a" and "twitter-hashtag" in e.attrs.get("class"):
             s += e.text
+        # Add link as text
         if e.name == "a" and "twitter-timeline-link" in e.attrs.get("class"):
             s += " " + e.attrs.get("href")
     return s
@@ -68,7 +73,6 @@ async def on_ready():
                     # When launched, old_tweets_url is empty
                     # Add the tweets in memory first, no need to send them
                     # in Discord
-                    print(old_tweets_url)
                     if old_tweets_url:
                         for tweet in tweets:
                             if not tweet.permalink in old_tweets_url:
