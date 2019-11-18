@@ -47,8 +47,6 @@ def tweet_converter(tweet):
             s += " " + e.attrs.get("href")
     return s
 
-old_tweets_url = []
-
 client = discord.Client()
 
 @client.event  
@@ -73,7 +71,7 @@ async def on_ready():
                     # When launched, old_tweets_url is empty
                     # Add the tweets in memory first, no need to send them
                     # in Discord
-                    if old_tweets_url:
+                    if len(old_tweets_url) > 0 :
                         for tweet in tweets:
                             if not tweet.permalink in old_tweets_url:
                                 await client.get_channel(channel_rer).send(tweet.text)
