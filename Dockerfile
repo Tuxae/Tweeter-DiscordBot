@@ -2,9 +2,9 @@ FROM alpine:3.10.3
 
 # This hack is widely applied to avoid python printing issues in docker containers.
 # See: https://github.com/Docker-Hub-frolvlad/docker-alpine-python3/pull/13
-ENV PYTHONUNBUFFERED=1
+# ENV PYTHONUNBUFFERED=1
 
-RUN apk add --update python3 git && \
+RUN apk add --update python3 git gcc python3-dev musl-dev && \
     rm  -rf /tmp/* /var/cache/apk/* && \
     if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi && \
     \
