@@ -56,7 +56,7 @@ class MyClient(discord.Client):
         self.old_tweets_url = []
 
     async def on_ready(self):
-	print('Bot ready :-)') 
+        print('Bot ready :-)')
         print('Logged in as')
         print(self.user.name)
         print(self.user.id)
