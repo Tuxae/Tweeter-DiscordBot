@@ -9,12 +9,6 @@ from my_constants import TOKEN, channel_rer
 
 url = "https://twitter.com/RERB?lang=fr"
 
-class Tweet():
-    
-    def __init__(self,permalink,text):
-        self.permalink = permalink
-        self.text = text
-
 def emoji_converter(emoji):
     return {
         "Emoji: Croix" : lambda : ":x:",
@@ -47,35 +41,53 @@ def tweet_converter(tweet):
             s += " " + e.attrs.get("href")
     return s
 
-client = discord.Client()
+class Tweet():
+    
+    def __init__(self,permalink,text):
+        self.permalink = permalink
+        self.text = text
 
-@client.event  
-async def on_ready():  
-    old_tweets_url = []
-    print('Bot ready :-)') 
-    while True:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as r:
-                if r.status == 200:
-                    html = await r.text()
-                    soup = BeautifulSoup(html, 'html.parser')
-                    tweets_p = soup.findAll("p", class_="tweet-text")
-                    tweets_div = soup.findAll("div", class_="tweet")
-                    tweets_url = [div.attrs.get("data-permalink-path") 
+class MyClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # create the background task and run it in the background
+        self.bg_task = self.loop.create_task(self.my_background_task())
+        self.old_tweets_url = []
+
+    async def on_ready(self):
+	print('Bot ready :-)') 
+        print('Logged in as')
+        print(self.user.name)
+        print(self.user.id)
+        print('------')
+
+    async def my_background_task(self):
+        await self.wait_until_ready()
+        while not self.is_closed():
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as r:
+                    if r.status == 200:
+                        html = await r.text()
+                        soup = BeautifulSoup(html, 'html.parser')
+                        tweets_p = soup.findAll("p", class_="tweet-text")
+                        tweets_div = soup.findAll("div", class_="tweet")
+                        tweets_url = [div.attrs.get("data-permalink-path") 
                             for div in tweets_div]
-                    tweets_text = list(map(tweet_converter,tweets_p))
-                    tweets = [Tweet(permalink, text) 
+                        tweets_text = list(map(tweet_converter,tweets_p))
+                        tweets = [Tweet(permalink, text) 
                             for permalink, text in zip(tweets_url,tweets_text)]
-                    # Reverse the list to send tweets in the chronological order
-                    tweets.reverse()
-                    # When launched, old_tweets_url is empty
-                    # Add the tweets in memory first, no need to send them
-                    # in Discord
-                    if len(old_tweets_url) > 0 :
-                        for tweet in tweets:
-                            if not tweet.permalink in old_tweets_url:
-                                await client.get_channel(channel_rer).send(tweet.text)
-                    old_tweets_url = tweets_url.copy()
-                await asyncio.sleep(20)
+                        # Reverse the list to send tweets in the chronological order
+                        tweets.reverse()
+                        # When launched, old_tweets_url is empty
+                        # Add the tweets in memory first, no need to send them
+                        # in Discord
+                        if len(self.old_tweets_url) > 0 :
+                            for tweet in tweets:
+                                if not tweet.permalink in self.old_tweets_url:
+                                    await client.get_channel(channel_rer).send(tweet.text)
+                        self.old_tweets_url = tweets_url.copy()
+                        await asyncio.sleep(20) #tasks run every 20 seconds
 
+client = MyClient()
 client.run(TOKEN)
